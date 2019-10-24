@@ -1,10 +1,15 @@
 #version 400
 
 uniform sampler2D diffuse_tex;
-uniform vec3 lightcolor;
-uniform float Ka;
-uniform float Kd;
-uniform float Ks;
+
+uniform float La;
+uniform float Ld;
+uniform float Ls;
+uniform float shiness;
+uniform vec3 Ka;
+uniform vec3 Kd;
+uniform vec3 Ks;
+uniform bool useTexture;
 
 out vec4 fragcolor;           
 in vec2 tex_coord;
@@ -14,19 +19,35 @@ vec3 ambient;
 vec3 diffuse;
 vec3 specular;
 
-in float Rd;
-in float Rs;
-in float attenuation; 
+in vec3 dist;
+in vec4 p;
+in vec3 n;
+in vec3 l;
+in vec3 r;
+in vec3 v;
+
+float Rd;
+float Rs;
+float attenuation; 
 
 void main(void)
 {  
-   
-   ambient = lightcolor * Ka;
-   diffuse = Rd * Kd * lightcolor;
-   specular = Rs * Ks * lightcolor;
-   light = ambient + attenuation * (diffuse + specular);
    vec4 tex_color = texture(diffuse_tex, tex_coord);
-   fragcolor =  tex_color * vec4(light,1.0);
+   Rd = max(dot(n,l), 0);
+   Rs = pow(max(0, dot(r,v)),shiness);
+   attenuation = 1/pow(length(dist),2);
+   if(useTexture){
+   ambient = vec3(tex_color) * La;
+   diffuse = vec3(tex_color) * Rd * Ld ;
+   }
+   else{
+   ambient = Ka * La;
+   diffuse = Rd * Ld * Kd;
+   }
+   specular = Rs * Ls * Ks;
+   light = ambient + attenuation * (diffuse + specular);
+   
+   fragcolor =  vec4(light,1.0);
 }
 
 

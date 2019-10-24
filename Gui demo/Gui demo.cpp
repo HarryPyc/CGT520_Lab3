@@ -31,10 +31,14 @@ MeshData mesh_data;
 
 float angle = 0.0f;
 float scale = 1.0f;
-float lightPos[3] = { 0.5f,0.5f,0.5f };
-float lightColor[3] = {0.25,0.25,0.25 };
-float Ka = 1.0f, Kd = 1.0f, Ks = 1.0f;
-float shiness = 2.0f;
+float lightPos[3] = { 0.0f,0.0f,1.0f };
+float Ka[3] = { 0.25,0.25,0.25 };
+float Kd[3] = { 0.25,0.25,0.25 };
+float Ks[3] = { 1,1,1 };
+float La = 1.0f, Ld = 1.0f, Ls = 1.0f;
+float shiness = 32.0f;
+
+bool useTexture = true;
 //Draw the ImGui user interface
 void draw_gui()
 {
@@ -48,11 +52,14 @@ void draw_gui()
 
    ImGui::Begin("Light");
    ImGui::SliderFloat3("Point Light Pos", lightPos, -2.5f, 2.5f);
-   ImGui::ColorEdit3("LightColor", lightColor);
-   ImGui::SliderFloat("Ka", &Ka, 0.0f, 5.0f);
-   ImGui::SliderFloat("Kd", &Kd, 0.0f, 5.0f);
-   ImGui::SliderFloat("Ks", &Ks, 0.0f, 5.0f);
-   ImGui::SliderFloat("Shiness", &shiness, 1.0f, 10.0f);
+   ImGui::ColorEdit3("Ka", Ka);
+   ImGui::ColorEdit3("Kd", Kd);
+   ImGui::ColorEdit3("Ks", Ks);
+   ImGui::SliderFloat("La", &La, 0.0f, 5.0f);
+   ImGui::SliderFloat("Ld", &Ld, 0.0f, 5.0f);
+   ImGui::SliderFloat("Ls", &Ls, 0.0f, 5.0f);
+   ImGui::SliderFloat("Shiness", &shiness, 0.0f, 100.0f);
+   ImGui::Checkbox("UseTexture", &useTexture);
    ImGui::End();
 
    static bool show_test = false;
@@ -108,30 +115,42 @@ void display()
 	   
 	   glUniform3fv(lightPos_loc, 1, lightPos);
    }
-   int lightColor_loc = glGetUniformLocation(shader_program, "lightcolor");
-   if (lightColor_loc != -1) {
-	   glUniform3fv(lightColor_loc, 1, lightColor);
-   }
-
    int Ka_loc = glGetUniformLocation(shader_program, "Ka");
    if (Ka_loc != -1) {
-	   glUniform1f(Ka_loc, Ka);
-   }
-   int Kd_loc = glGetUniformLocation(shader_program, "Kd");
-   if (Kd_loc != -1) {
-	   glUniform1f(Kd_loc, Kd);
+	   glUniform3fv(Ka_loc, 1, Ka);
    }
    int Ks_loc = glGetUniformLocation(shader_program, "Ks");
    if (Ks_loc != -1) {
-	   glUniform1f(Ks_loc, Ks);
+	   glUniform3fv(Ks_loc, 1, Ks);
+   }
+   int Kd_loc = glGetUniformLocation(shader_program, "Kd");
+   if (Kd_loc != -1) {
+	   glUniform3fv(Kd_loc, 1, Kd);
+   }
+
+   int La_loc = glGetUniformLocation(shader_program, "La");
+   if (La_loc != -1) {
+	   glUniform1f(La_loc, La);
+   }
+   int Ld_loc = glGetUniformLocation(shader_program, "Ld");
+   if (Ld_loc != -1) {
+	   glUniform1f(Ld_loc, Ld);
+   }
+   int Ls_loc = glGetUniformLocation(shader_program, "Ls");
+   if (Ls_loc != -1) {
+	   glUniform1f(Ls_loc, Ls);
    }
    int shiness_loc = glGetUniformLocation(shader_program, "shiness");
    if (shiness_loc != -1) {
 	   glUniform1f(shiness_loc, shiness);
    }
+   int useTexture_loc = glGetUniformLocation(shader_program, "useTexture");
+   if (useTexture_loc != -1) {
+	   glUniform1f(useTexture_loc, useTexture);
+   }
    int eye_loc = glGetUniformLocation(shader_program, "eye");
    if (eye_loc != -1) {
-	   glm::vec3 eye = glm::vec3(glm::inverse(V)*glm::vec4(0.0f, 1.0f, 2.0f,1.0f));
+	   glm::vec3 eye = glm::vec3(0.0f, 1.0f, 2.0f);
 	   glUniform3fv(eye_loc, 1, glm::value_ptr(eye));
    }
    glBindVertexArray(mesh_data.mVao);
