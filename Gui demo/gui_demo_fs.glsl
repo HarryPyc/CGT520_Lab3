@@ -2,6 +2,7 @@
 
 uniform sampler2D diffuse_tex;
 
+uniform vec3 eye;
 uniform float La;
 uniform float Ld;
 uniform float Ls;
@@ -23,8 +24,8 @@ in vec3 dist;
 in vec4 p;
 in vec3 n;
 in vec3 l;
-in vec3 r;
-in vec3 v;
+vec3 r;
+vec3 v;
 
 float Rd;
 float Rs;
@@ -34,6 +35,9 @@ void main(void)
 {  
    vec4 tex_color = texture(diffuse_tex, tex_coord);
    Rd = max(dot(n,l), 0);
+
+   v = normalize(eye - vec3(p));
+   r = reflect(-l, n);
    Rs = pow(max(0, dot(r,v)),shiness);
    attenuation = 1/pow(length(dist),2);
    if(useTexture){

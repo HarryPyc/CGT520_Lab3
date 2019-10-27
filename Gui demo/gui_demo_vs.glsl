@@ -6,7 +6,7 @@ uniform mat4 M;
 
 
 uniform vec3 lightpos;
-uniform vec3 eye;
+
 uniform float time;
 
 in vec3 pos_attrib;
@@ -17,8 +17,7 @@ out vec3 dist;
 out vec4 p;
 out vec3 n;
 out vec3 l;
-out vec3 r;
-out vec3 v;
+
 
 
 
@@ -34,8 +33,7 @@ void main(void)
    l = normalize(dist);
    n = vec3(normalize(M * vec4(normal_attrib, 0.0)));
    
-   v = normalize(eye - vec3(p));
-   r = reflect(-l, n);
+   
  
    tex_coord = tex_coord_attrib;
 }
